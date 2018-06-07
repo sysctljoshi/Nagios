@@ -1,0 +1,24 @@
+#!/bin/sh
+
+warn=$1
+crit=$2
+
+tx=`vnstat -tr | grep tx | grep Mbit |  awk '{print $2;}' | awk -F\. '{ print $1 }'`
+rx=`vnstat -tr | grep rx | grep Mbit |  awk '{print $2;}' | awk -F\. '{ print $1 }'`
+
+status="$rx $tx"
+
+echo $status
+if [ $warn -lt $rx ] || [ $warn -lt $tx ]
+then
+  if [ $crit -lt $rx ] || [ $crit -lt $tx ]
+  then
+    echo "CRITICAL - $status"
+    exit 2
+  else
+    echo "WARNING - $status"
+    exit 1
+  fi
+else
+  echo "OK - $status"
+fi
